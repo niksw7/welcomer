@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: welcomer
+  name: welcomer
+spec:
+  type: NodePort 
+  ports:
+  - port: 8080
+    protocol: TCP
+    nodePort: 31234
+    targetPort: 8080
+  selector:
+    app: welcomer

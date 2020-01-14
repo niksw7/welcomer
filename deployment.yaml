@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: welcomer
+  namespace: hackerspace
+  labels:
+    app: welcomer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: welcomer
+  template:
+    metadata:
+      labels:
+        app: welcomer
+    spec:
+      containers:
+      - name: welcomer
+        image: welcomer:1.0
+        ports:
+        - containerPort: 8080
+          name: http
