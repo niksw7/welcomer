@@ -4,14 +4,28 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
-	"github.com/gin-gonic/gin"
+	"os"
 )
 
+var (
+	guestrackerhost = os.Getenv("GUEST_TRACKER_HOST")
+)
+
+//kubectl expose deployment welcomer --type=LoadBalancer --name=welcomer1 -n hackerspace
 func main() {
+	if guestrackerhost == "" {
+		guestrackerhost = "localhost"
+	}
+
+	fmt.Println("GUEST_TRACKER_HOST =",guestrackerhost)
+	
 	r := gin.Default()
 	r.GET("/welcome", func(c *gin.Context) {
+		fmt.Println(c.Request.Header)
+		fmt.Println(c.Request.Host)
 		welcomeHandler(c)
 	})
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
@@ -33,7 +47,7 @@ func guesttracker(c *gin.Context) {
 	if err != nil {
 		print(err)
 	}
-	resp, err := http.Post("https://localhost:8081/track-guest",
+	resp, err := http.Post("http://"+guestrackerhost+":8081/track-guest",
 		"application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		print(err)

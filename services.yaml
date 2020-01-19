@@ -1,15 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: welcomer
+  namespace: hackerspace
   labels:
     app: welcomer
-  name: welcomer
 spec:
-  type: NodePort 
+  type: LoadBalancer 
   ports:
   - port: 8080
     protocol: TCP
-    nodePort: 31234
-    targetPort: 8080
   selector:
     app: welcomer

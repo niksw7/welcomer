@@ -18,6 +18,9 @@ spec:
       containers:
       - name: welcomer
         image: welcomer:1.0
+        env:
+        - name: GUEST_TRACKER_HOST
+          value: "guesttracker"
         ports:
         - containerPort: 8080
           name: http
