@@ -14,7 +14,6 @@ var (
 	guestrackerhost = os.Getenv("GUEST_TRACKER_HOST")
 )
 
-//kubectl expose deployment welcomer --type=LoadBalancer --name=welcomer1 -n hackerspace
 func main() {
 	if guestrackerhost == "" {
 		guestrackerhost = "localhost"
@@ -35,7 +34,7 @@ func welcomeHandler(c *gin.Context) {
 	//Send post request to another service
 	guesttracker(c)
 	c.JSON(200, gin.H{
-		"message": "Hello babes .. Was waiting for you!!",
+		"message": "Hello Folks .. You are welcome(Shhh... and also tracked by guesttracker)!!",
 	})
 }
 
