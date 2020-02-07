@@ -8,6 +8,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
+
+	"contrib.go.opencensus.io/exporter/ocagent"
+	"go.opencensus.io/trace"
+
+	"go.opencensus.io/plugin/ochttp"
 )
 
 var (
@@ -18,10 +24,21 @@ func main() {
 	if guestrackerhost == "" {
 		guestrackerhost = "localhost"
 	}
+	fmt.Println("GUEST_TRACKER_HOST =", guestrackerhost)
 
-	fmt.Println("GUEST_TRACKER_HOST =",guestrackerhost)
-	
+	ocagentHost := "oc-collector.tracing:55678"
+	oce, _ := ocagent.NewExporter(
+		ocagent.WithInsecure(),
+		ocagent.WithReconnectionPeriod(1*time.Second),
+		ocagent.WithAddress(ocagentHost),
+		ocagent.WithServiceName("welcomer"))
+
+	trace.RegisterExporter(oce)
+	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+
+
 	r := gin.Default()
+
 	r.GET("/welcome", func(c *gin.Context) {
 		fmt.Println(c.Request.Header)
 		fmt.Println(c.Request.Host)
@@ -46,8 +63,24 @@ func guesttracker(c *gin.Context) {
 	if err != nil {
 		print(err)
 	}
-	resp, err := http.Post("http://"+guestrackerhost+":8081/track-guest",
-		"application/json", bytes.NewBuffer(reqBody))
+	client := &http.Client{Transport: &ochttp.Transport{}}
+	ctxnew, span := trace.StartSpan(c.Request.Context(), "child")
+	fmt.Println("-------------------")
+	fmt.Println(ctxnew)
+	defer span.End()
+	span.Annotate([]trace.Attribute{trace.StringAttribute("key", "value")}, "something happened")
+	span.AddAttributes(trace.StringAttribute("hello", "world"))
+	time.Sleep(time.Millisecond * 125)
+	
+	r, _ := http.NewRequest("POST", "http://"+guestrackerhost+"/track-guest", bytes.NewBuffer(reqBody))
+
+	r = r.WithContext(c.Request.Context())
+
+	// resp, err := http.Post("http://"+guestrackerhost+"/track-guest",
+	// 	"application/json", bytes.NewBuffer(reqBody))
+
+	resp, err := client.Do(r)
+
 	if err != nil {
 		print(err)
 	}

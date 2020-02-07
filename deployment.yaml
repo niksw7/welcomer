@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: welcomer
+  annotations:
+    config.linkerd.io/trace-collector: "oc-collector.tracing:55678"
   namespace: hackerspace
   labels:
     app: welcomer
@@ -17,10 +19,10 @@ spec:
     spec:
       containers:
       - name: welcomer
-        image: welcomer:1.0
+        image: welcomer:1.2
         env:
         - name: GUEST_TRACKER_HOST
-          value: "guesttracker"
+          value: "guesttracker.loreans.com"
         ports:
         - containerPort: 8080
           name: http
