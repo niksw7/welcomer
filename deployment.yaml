@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: welcomer
-        image: welcomer:1.2
+        image: welcomer:1.11
         env:
         - name: GUEST_TRACKER_HOST
           value: "guesttracker.loreans.com"

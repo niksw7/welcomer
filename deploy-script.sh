@@ -6,6 +6,8 @@ exitIfReturnCodeNonZero(){
             exit $returnvalue
       fi
 }
+#create namespace
+kubectl create namespace hackerspace
 # cleanup [start]
 kubectl delete deployments guesttracker welcomer nginx-ingress -n hackerspace
 kubectl delete deployments guesttracker welcomer nginx-ingress -n hackerspace
